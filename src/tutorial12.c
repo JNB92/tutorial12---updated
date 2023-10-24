@@ -87,6 +87,9 @@ int main(void)
     See src/timer.c.
     */
 
+    uint8_t pb_sample = pb_debounced_state; // Store the current debounced state
+    uint8_t pb_sample_r = 0xFF; // Store the previous sample
+    uint8_t pb_changed, falling_edges, rising_edges; // Store the change in state
 
     while (1)
     {
@@ -106,36 +109,36 @@ int main(void)
         the pushbuttons.
         */
 
-        static uint8_t prev_pb_debounced_state = 0xFF;
+        pb_sample_r = pb_sample; // Store previous sample
+        pb_sample = pb_debounced_state; // Sample pushbutton state
 
-        // Detect rising edges
-        uint8_t rising_edges = ~prev_pb_debounced_state & pb_debounced_state;
+        pb_changed = pb_sample_r ^ pb_sample; // Detect change in state
 
-        // Detect falling edges
-        uint8_t falling_edges = prev_pb_debounced_state & ~pb_debounced_state;
+        falling_edges = pb_changed & pb_sample_r;
+        rising_edges = pb_changed & pb_sample;
 
         switch (currentstate)
         {
             case WAIT:
-                if (rising_edges & (1 << 4)) // Check for S1 pressed
+                if (falling_edges & PIN4_bm) // Check for S1 pressed
                 {
                     currentstate = TONE1;
                     buzzer_on(0);
                     update_display(DISP_VERT_BAR_LEFT, DISP_OFF);
                 }
-                else if (rising_edges & (1 << 5)) // Check for S2 pressed
+                else if (falling_edges & PIN5_bm) // Check for S2 pressed
                 {
                     currentstate = TONE2;
                     buzzer_on(1);
-                    update_display(DISP_OFF, DISP_VERT_BAR_LEFT);
+                    update_display(DISP_VERT_BAR_RIGHT, DISP_OFF);
                 }
-                else if (rising_edges & (1 << 6)) // Check for S3 pressed
+                else if (falling_edges & PIN6_bm) // Check for S3 pressed
                 {
                     currentstate = TONE3;
                     buzzer_on(2);
-                    update_display(DISP_VERT_BAR_RIGHT, DISP_OFF);
+                    update_display(DISP_OFF, DISP_VERT_BAR_LEFT);
                 }
-                else if (rising_edges & (1 << 7)) // Check for S4 pressed
+                else if (falling_edges & PIN7_bm) // Check for S4 pressed
                 {
                     currentstate = TONE4;
                     buzzer_on(3);
@@ -144,7 +147,7 @@ int main(void)
                 break;
 
             case TONE1:
-                if (falling_edges & (1 << 4))
+                if (rising_edges & PIN4_bm)
                 {
                     currentstate = WAIT;
                     buzzer_off();
@@ -153,7 +156,7 @@ int main(void)
                 break;
 
             case TONE2:
-                if (falling_edges & (1 << 5))
+                if (rising_edges & PIN5_bm)
                 {
                     currentstate = WAIT;
                     buzzer_off();
@@ -162,7 +165,7 @@ int main(void)
                 break;
 
             case TONE3:
-                if (falling_edges & (1 << 6))
+                if (rising_edges & PIN6_bm)
                 {
                     currentstate = WAIT;
                     buzzer_off();
@@ -171,7 +174,7 @@ int main(void)
                 break;
 
             case TONE4:
-                if (falling_edges & (1 << 7))
+                if (rising_edges & PIN7_bm)
                 {
                     currentstate = WAIT;
                     buzzer_off();
@@ -186,8 +189,7 @@ int main(void)
                 break;
         }
 
-        prev_pb_debounced_state = pb_debounced_state;
-
+        
         /** CODE: Write your code for Ex 12.5 above this line. */
     }
 }

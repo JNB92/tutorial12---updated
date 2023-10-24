@@ -27,7 +27,6 @@ static void pb_debounce(void)
     // Sample pushbutton state
     uint8_t pb_state = PORTA.IN;
 
-
     uint8_t pb_changed = pb_state ^ pb_debounced_state; // Detect change in state
 
     count1 = (count1 ^ count0) & pb_changed; // Increment counters
@@ -35,10 +34,6 @@ static void pb_debounce(void)
 
     pb_debounced_state ^= (count1 & count0); // Update debounced state
 
-    // // This variable contains a raw sample of the pushbuttons.
-    // // Modify the code in this function to implement debouncing
-    // // correctly.
-    // pb_debounced_state = pb_state;
 }
 
 static void spi_write(void)

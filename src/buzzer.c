@@ -31,7 +31,7 @@ void buzzer_on(const uint8_t tone)
     if (tone > 3) return;
 
     // Set the period for TCA0
-    TCA0.SINGLE.PER = periods[tone];
+    TCA0.SINGLE.PER = 3333333 / periods[tone];
 
     // Set duty cycle to 50%. 
     TCA0.SINGLE.CMP0 = periods[tone] / 2;
@@ -42,7 +42,7 @@ void buzzer_off(void)
 {
     /** CODE: Write your code for Ex 12.3 within this function. */
     
-    // To make the buzzer silent, set the duty cycle to 0.
+    // Set the period for TCA0
     TCA0.SINGLE.CMP0 = 0;
 
 }
