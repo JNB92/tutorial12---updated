@@ -5,10 +5,10 @@
 #include "buzzer.h"
 
 // Values used to write to the TCA0.SINGLE.PERBUF register.
-#define TONE1_PER 13267 
-#define TONE2_PER 14547
-#define TONE3_PER 11562
-#define TONE4_PER 15953
+#define TONE1_PER 354
+#define TONE2_PER 297
+#define TONE3_PER 472
+#define TONE4_PER 177
 
 /** EX: 12.3
 
@@ -27,12 +27,22 @@ void buzzer_on(const uint8_t tone)
 
     /** CODE: Write your code for Ex 12.3 within this function. */
 
+    // Check if the tone value is valid
+    if (tone > 3) return;
+
+    // Set the period for TCA0
+    TCA0.SINGLE.PER = periods[tone];
+
+    // Set duty cycle to 50%. 
+    TCA0.SINGLE.CMP0 = periods[tone] / 2;
 
 }
 
 void buzzer_off(void)
 {
     /** CODE: Write your code for Ex 12.3 within this function. */
-
+    
+    // To make the buzzer silent, set the duty cycle to 0.
+    TCA0.SINGLE.CMP0 = 0;
 
 }

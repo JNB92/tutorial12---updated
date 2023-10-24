@@ -26,21 +26,23 @@ void pwm_init(void)
     be silent initially.
     */
 
-   PORTB.DIRSET = PIN0_bm; // Set PB0 as output
+   // Configure pins
+   PORTB.DIRSET = PIN0_bm;
+
+    // Configure TCA0
+    TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_SINGLESLOPE_gc; 
+
+    // Enable waveform output on PB0
+    TCA0.SINGLE.CTRLB |= TCA_SINGLE_CMP0EN_bm;
+
+    // Set period to 7062
+    TCA0.SINGLE.PER = 7062;
+
+    // Set duty cycle to 50%
+    TCA0.SINGLE.CMP0 = TCA0.SINGLE.PER >> 1;
 
 
-    TCA0.SINGLE.CTRLB = TCA_SINGLE_WGMODE_SINGLESLOPE_gc; // Set single slope PWM mode
-
-
-    TCA0.SINGLE.CTRLB |= TCA_SINGLE_CMP0EN_bm; // Enable compare channel 0
-
-
-    // TCA0.SINGLE.PER = (uint16_t)(F_CPU / TONE1_PER - 1); // adjust TONE1_PER LATER
-
-
-    TCA0.SINGLE.CMP0 = TCA0.SINGLE.PER / 2; // Set duty cycle
-
-
+    // Enable TCA0
     TCA0.SINGLE.CTRLA = TCA_SINGLE_ENABLE_bm | TCA_SINGLE_CLKSEL_DIV1_gc;
 
     /** CODE: Write your code for Ex 12.2 within this function. */

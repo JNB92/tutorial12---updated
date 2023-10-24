@@ -65,7 +65,7 @@ int main(void)
     TONE4} 
     state_tone;
 
-    state_tone state = WAIT;
+    state_tone currentstate = WAIT;
 
 
     /** CODE: Write your code for Ex 12.1 above this line. */
@@ -106,6 +106,87 @@ int main(void)
         the pushbuttons.
         */
 
+        static uint8_t prev_pb_debounced_state = 0xFF;
+
+        // Detect rising edges
+        uint8_t rising_edges = ~prev_pb_debounced_state & pb_debounced_state;
+
+        // Detect falling edges
+        uint8_t falling_edges = prev_pb_debounced_state & ~pb_debounced_state;
+
+        switch (currentstate)
+        {
+            case WAIT:
+                if (rising_edges & (1 << 4)) // Check for S1 pressed
+                {
+                    currentstate = TONE1;
+                    buzzer_on(0);
+                    update_display(DISP_VERT_BAR_LEFT, DISP_OFF);
+                }
+                else if (rising_edges & (1 << 5)) // Check for S2 pressed
+                {
+                    currentstate = TONE2;
+                    buzzer_on(1);
+                    update_display(DISP_OFF, DISP_VERT_BAR_LEFT);
+                }
+                else if (rising_edges & (1 << 6)) // Check for S3 pressed
+                {
+                    currentstate = TONE3;
+                    buzzer_on(2);
+                    update_display(DISP_VERT_BAR_RIGHT, DISP_OFF);
+                }
+                else if (rising_edges & (1 << 7)) // Check for S4 pressed
+                {
+                    currentstate = TONE4;
+                    buzzer_on(3);
+                    update_display(DISP_OFF, DISP_VERT_BAR_RIGHT);
+                }
+                break;
+
+            case TONE1:
+                if (falling_edges & (1 << 4))
+                {
+                    currentstate = WAIT;
+                    buzzer_off();
+                    update_display(DISP_OFF, DISP_OFF);
+                }
+                break;
+
+            case TONE2:
+                if (falling_edges & (1 << 5))
+                {
+                    currentstate = WAIT;
+                    buzzer_off();
+                    update_display(DISP_OFF, DISP_OFF);
+                }
+                break;
+
+            case TONE3:
+                if (falling_edges & (1 << 6))
+                {
+                    currentstate = WAIT;
+                    buzzer_off();
+                    update_display(DISP_OFF, DISP_OFF);
+                }
+                break;
+
+            case TONE4:
+                if (falling_edges & (1 << 7))
+                {
+                    currentstate = WAIT;
+                    buzzer_off();
+                    update_display(DISP_OFF, DISP_OFF);
+                }
+                break;
+
+            default:
+                currentstate = WAIT;
+                buzzer_off();
+                update_display(DISP_OFF, DISP_OFF);
+                break;
+        }
+
+        prev_pb_debounced_state = pb_debounced_state;
 
         /** CODE: Write your code for Ex 12.5 above this line. */
     }
