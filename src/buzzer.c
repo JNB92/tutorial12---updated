@@ -34,7 +34,7 @@ void buzzer_on(const uint8_t tone)
     TCA0.SINGLE.PER = 3333333 / periods[tone];
 
     // Set duty cycle to 50%. 
-    TCA0.SINGLE.CMP0 = periods[tone] / 2;
+    TCA0.SINGLE.CMP0 = TCA0.SINGLE.PER >> 1;
 
 }
 
